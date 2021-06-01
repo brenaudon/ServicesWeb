@@ -7,6 +7,10 @@
     {
       "name": "bot2",
       "brain": "bot2.rive"
+    },
+    {
+      "name": "gloubi",
+      "brain": "bot.rive"
     }
   ]
 }

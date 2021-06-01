@@ -1,0 +1,29 @@
+{
+  "name": "BotLane",
+  "version": "1.0.0",
+  "description": "Service d'administration de ChatBot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brenaudon/ServiceWeb.git"
+  },
+  "author": "cnonnet brenaudon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brenaudon/ServiceWeb/issues"
+  },
+  "homepage": "https://github.com/brenaudon/ServiceWeb#readme",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "esm": "^3.2.25",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "lowdb": "^1.0.0",
+    "moment": "^2.29.1",
+    "rivescript": "^2.1.0",
+    "socket.io": "^4.1.2"
+  }
+}

@@ -1,0 +1,27 @@
+<%- include("top.ejs") %>
+		<div class="join-container">
+			<header class="join-header">
+				<h1><i class="fas fa-smile"></i>BotLane</h1>
+			</header>
+			<main class="join-main">
+				<form action="chat">
+					<div class="form-control">
+						<label for="bot">Bot</label>
+						<select name="bot" id="bot">
+							<%botlist.forEach((e) => {%>
+							<option value="<%=e.name%>"><%=e.name%></option>
+								<%})%>
+						</select>
+					</div>
+					<button type="submit" class="btn">Rejoindre le chat</button>
+				</form>
+				<form action="addbot">
+					<button type="submit" class="btn">Ajouter un bot</button>
+				</form>
+				<form action="delbot">
+					<button type="submit" class="btn">Supprimer un bot</button>
+				</form>
+			</main>
+		</div>
+	</body>
+</html>

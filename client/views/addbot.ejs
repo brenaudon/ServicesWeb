@@ -1,0 +1,23 @@
+<%- include("top.ejs") %>
+
+<form action = '/addbot2' method = "post">
+    <input
+            type="text"
+            name="bot_name"
+            id="bot_name"
+            placeholder="Enter bot name..."
+            required
+    />
+    <div class="form-control">
+        <label for="bot">Cerveau : </label>
+        <select name="bot_brain" id="bot_brain">
+            <%brainlist.forEach((e) => {%>
+            <option value="<%=e%>"><%=e%></option>
+            <%})%>
+        </select>
+    </div>
+    <button type="submit" class="btn">Valider</button>
+</form>
+
+</body>
+</html>
