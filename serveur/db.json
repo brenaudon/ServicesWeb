@@ -1,0 +1,12 @@
+{
+  "bots": [
+    {
+      "name": "steeve",
+      "brain": "bot.rive"
+    },
+    {
+      "name": "bot2",
+      "brain": "bot2.rive"
+    }
+  ]
+}

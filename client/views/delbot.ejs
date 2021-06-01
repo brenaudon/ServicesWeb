@@ -1,0 +1,16 @@
+<%- include("top.ejs") %>
+
+<form action = '/delbot2' method = "post">
+    <div class="form-control">
+        <label for="bot">Bot</label>
+        <select name="bot_name" id="bot_name">
+            <%botlist.forEach((e) => {%>
+            <option value="<%=e.name%>"><%=e.name%></option>
+            <%})%>
+        </select>
+    </div>
+    <button type="submit" class="btn">Valider</button>
+</form>
+
+</body>
+</html>
