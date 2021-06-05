@@ -2,8 +2,11 @@ const express = require("express");
 const http = require('http');
 const socketio = require("socket.io");
 const ejs = require("ejs");
+const RiveScript = require("rivescript");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+
 const formatMessage = require('./utils/messages');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,116 +16,201 @@ const host = "localhost";
 const port = "3000";
 
 app.set("port",process.env.PORT||port);
-app.set('view engine', 'ejs');
+app.set('view engine','ejs');
 
 app.use(express.static(__dirname+'/public'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+var Bot = new RiveScript();
+
+var Bots = [];
+initBots();
+
 io.on('connection', socket => {
+
+    // Join chatroom
     socket.on('joinChat', botname => {
         socket.join(botname);
-        socket.emit('message', formatMessage('The Welcoming Bot ', 'Welcome to BotLane!'));
-    });
-
-    // Listen for chatMessage
-    socket.on('chatMessage', (msg) => {
-        message = msg.msg
-        botname = msg.bot
-        socket.emit('message', formatMessage('You ',message));
-        let xml_req = new XMLHttpRequest();
-        xml_req.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                console.log(xml_req.responseText)
-                socket.emit('message', formatMessage(botname+' ',xml_req.responseText))
+        let already_loaded = false;
+        for (let i = 0; i < Bots.length; i++){
+            if(Bots[i][0] === botname && Bots[i][1] != null){
+                already_loaded = true;
             }
-        };
-        xml_req.open("get", "http://localhost:8000/botreply/" + message + "/" + botname, true);
-        xml_req.send(null);
-        });
+        }
+        console.log(already_loaded);
+        if (already_loaded === false){
+            let xml_req = new XMLHttpRequest();
+            xml_req.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    fs.writeFile('./bots/' + botname + ".rive",xml_req.responseText,(err) => {
+                        if (err) return console.log(err);
+                        for (let i = 0; i < Bots.length; i++){
+                            if(Bots[i][0] === botname){
+                                Bots[i][1] = './bots/' + botname + ".rive";
+                                let newbot = new RiveScript();
+                                newbot.loadFile(Bots[i][1]).then( () => {
+                                    newbot.sortReplies();
+                                })
+                                Bot = newbot;
+                            }
+                        }
+                    })
+                }
+            };
+            xml_req.open("get","http://localhost:8000/joinchat/" + botname,true);
+            xml_req.send(null);
+        }else{
+            for (let i = 0; i < Bots.length; i++){
+               if(Bots[i][0] === botname){
+                   let newbot = new RiveScript();
+                   newbot.loadFile(Bots[i][1]).then(() => {
+                       newbot.sortReplies();
+                   })
+                   Bot = newbot;
+               }
+            }
+        }
+        socket.emit('message',formatMessage('The Welcoming Bot ', 'Welcome to BotLane !'));
     });
 
-app.get('/',getBotList, function(req, res){
+    // Listen for messages
+    socket.on('chatMessage', (msg) => {
+        let message = msg.msg;
+        let botname = msg.bot;
+        socket.emit('message',formatMessage('You ',message));
+        Bot.reply("",message).then((reply) =>{
+            socket.emit('message', formatMessage(botname + ' ',reply));
+        })
+    });
+});
+
+
+app.get('/',getBotList, (req,res) => {
     res.render('index');
 })
-app.get('/addbot',getBrainList, function(req, res){
-    res.render('addbot');
-})
-app.get('/chat', function(req, res){
+
+app.get('/chat', (req,res) =>{
     res.render('chat');
 })
-app.get('/delbot',getBotList,function(req, res){
+
+app.get('/addbot',getBrainList, (req,res) => {
+    res.render('addbot');
+})
+
+app.get('/delbot',getBotList, (req,res) => {
     res.render('delbot');
 })
 
-app.post('/addbot2',(req,res) =>{
+app.get('/updatebot',getBotList,getBrainList, (req,res) => {
+    res.render('updatebot');
+})
+
+
+app.post('/addbot2',(req,res) => {
     let botname = req.body.bot_name;
     let botbrain = req.body.bot_brain;
     let xml_req = new XMLHttpRequest();
     xml_req.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
             let xml_req2 = new XMLHttpRequest();
             xml_req2.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
+                if (this.readyState === 4 && this.status === 200) {
                     res.locals.botlist = JSON.parse(xml_req2.responseText);
                     res.render("index");
                 }
             };
-            xml_req2.open("get", "http://localhost:8000/botlist", true);
+            xml_req2.open("get","http://localhost:8000/botlist",true);
             xml_req2.send(null);
         }
     };
-    xml_req.open("post", "http://localhost:8000/admin", true);
-    xml_req.setRequestHeader('Content-Type', 'application/json');
+    xml_req.open("post","http://localhost:8000/admin",true);
+    xml_req.setRequestHeader('Content-Type','application/json');
     xml_req.send(JSON.stringify({botname: botname, botbrain: botbrain}));
 })
 
-app.post('/delbot2',(req,res) =>{
+app.post('/delbot2',(req,res) => {
     let botname = req.body.bot_name;
     let xml_req = new XMLHttpRequest();
     xml_req.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
             let xml_req2 = new XMLHttpRequest();
             xml_req2.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
+                if (this.readyState === 4 && this.status === 200) {
                     res.locals.botlist = JSON.parse(xml_req2.responseText);
                     res.render("index");
                 }
             };
-            xml_req2.open("get", "http://localhost:8000/botlist", true);
+            xml_req2.open("get","http://localhost:8000/botlist",true);
             xml_req2.send(null);
         }
     };
-    xml_req.open("delete", "http://localhost:8000/admin/" + botname, true);
+    xml_req.open("delete","http://localhost:8000/admin/" + botname,true);
     xml_req.send(null);
 })
+
+app.post('/updatebot2',(req,res) => {
+    let botname = req.body.bot_name;
+    let botbrain = req.body.bot_brain;
+    let xml_req = new XMLHttpRequest();
+    xml_req.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            let xml_req2 = new XMLHttpRequest();
+            xml_req2.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    res.locals.botlist = JSON.parse(xml_req2.responseText);
+                    res.render("index");
+                }
+            };
+            xml_req2.open("get","http://localhost:8000/botlist",true);
+            xml_req2.send(null);
+        }
+    };
+    xml_req.open("put","http://localhost:8000/admin/" + botname + '/' + botbrain, true);
+    xml_req.send(null);
+})
+
+
+function initBots(){
+    let xml_req = new XMLHttpRequest();
+    xml_req.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            let botlist = JSON.parse(xml_req.responseText)
+            for (let i = 0; i < botlist.length; i++){
+                Bots.push([botlist[i].name,null]);
+            }
+        }
+    };
+    xml_req.open("get","http://localhost:8000/botlist", true);
+    xml_req.send(null);
+}
 
 function getBotList(req,res,next){
     let xml_req = new XMLHttpRequest();
     xml_req.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
             res.locals.botlist = JSON.parse(xml_req.responseText);
             next();
         }
     };
-    xml_req.open("get", "http://localhost:8000/botlist", true);
+    xml_req.open("get","http://localhost:8000/botlist", true);
     xml_req.send(null);
 }
 
 function getBrainList(req,res,next){
     let xml_req = new XMLHttpRequest();
     xml_req.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState === 4 && this.status === 200) {
             res.locals.brainlist = JSON.parse(xml_req.responseText);
             next();
         }
     };
-    xml_req.open("get", "http://localhost:8000/brainlist", true);
+    xml_req.open("get","http://localhost:8000/brainlist", true);
     xml_req.send(null);
 }
 
 
-server.listen(port,host,function(){
+server.listen(port,host,() => {
     console.log(`app listening @ http://${host}:${port}`)
 })
 

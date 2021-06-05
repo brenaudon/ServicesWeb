@@ -14,18 +14,36 @@ class BotList{
 	}
 
 	async addBot(nom,cerveau){
-		if(nom != undefined && cerveau != undefined){
-			this.db.get('bots').push({name: nom,brain: cerveau}).write();
+		if (nom !== undefined && cerveau !== undefined){
+			this.db.get('bots').push({name: nom, brain: cerveau}).write();
 		}else{console.log("error");}
 	}
 
-
 	async removeBot(nom){
-		this.db.get('bots').remove(e=>e.name == nom).write();
+		if (nom !== undefined) {
+			this.db.get('bots').remove(e => e.name === nom).write();
+		}
+	}
+
+	async updateBot(nom,cerveau){
+		if (nom !== undefined && cerveau !== undefined){
+			this.db.get('bots').find({ name: nom }).assign({brain: cerveau}).write();
+		}else{console.log("error");}
 	}
 
 	getBots(){
 		return this.db.get('bots').value();
+	}
+
+	getBotbrain(nom){
+		if (nom !== undefined){
+			let botlist = this.db.get('bots').value();
+			for (let i = 0; i < botlist.length; i++){
+				if (botlist[i].name === nom){
+					return botlist[i].brain;
+				}
+			}
+		}
 	}
 
 }

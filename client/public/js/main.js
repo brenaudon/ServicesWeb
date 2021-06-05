@@ -1,6 +1,7 @@
 const chatForm = document.getElementById('chat-form');
 const chatMessages = document.querySelector('.chat-messages');
 
+// Qs imported via script in chat.ejs
 const {bot} = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
@@ -10,32 +11,22 @@ const socket = io();
 // Join chatroom
 socket.emit('joinChat',bot);
 
-// Message from server
-socket.on('message', (message) => {
+// Message from user
+socket.on('message',(message) => {
   outputMessage(message);
-
-  // Scroll down
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+  chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll down
 });
 
 // Message submit
-chatForm.addEventListener('submit', (e) => {
+chatForm.addEventListener('submit',(e) => {
   e.preventDefault();
-
-  // Get message text
-  let msg = e.target.elements.msg.value;
-
+  let msg = e.target.elements.msg.value; // Get message text
   msg = msg.trim();
-
   if (!msg) {
     return false;
   }
-
-  // Emit message to server
-  socket.emit('chatMessage', {msg,bot});
-
-  // Clear input
-  e.target.elements.msg.value = '';
+  socket.emit('chatMessage',{msg,bot}); // Emit message to chat
+  e.target.elements.msg.value = ''; // Clear input
   e.target.elements.msg.focus();
 });
 
@@ -55,8 +46,9 @@ function outputMessage(message) {
   document.querySelector('.chat-messages').appendChild(div);
 }
 
+// Leave button
 document.getElementById('leave-btn').addEventListener('click', () => {
-  const leaveRoom = confirm('Are you sure you want to leave the chatroom?');
+  const leaveRoom = confirm('Êtes-vous sur de vouloir quitter la discussion ?');
   if (leaveRoom) {
     window.location = '/';
   } else {

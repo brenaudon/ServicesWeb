@@ -1,13 +1,14 @@
 <%- include("top.ejs") %>
 
-<form action = '/addbot2' method = "post">
-    <input
-            type="text"
-            name="bot_name"
-            id="bot_name"
-            placeholder="Entrer le nom du nouveau bot..."
-            required
-    />
+<form action = '/updatebot2' method = "post">
+    <div class="form-control">
+        <label for="bot">Bot</label>
+        <select name="bot_name" id="bot_name">
+            <%botlist.forEach((e) => {%>
+            <option value="<%=e.name%>"><%=e.name%></option>
+            <%})%>
+        </select>
+    </div>
     <div class="form-control">
         <label for="bot">Cerveau : </label>
         <select name="bot_brain" id="bot_brain">
