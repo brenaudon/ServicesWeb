@@ -1,23 +1,31 @@
 <%- include("top.ejs") %>
 
-<form action = '/addbot2' method = "post">
-    <input
-            type="text"
-            name="bot_name"
-            id="bot_name"
-            placeholder="Entrer le nom du nouveau bot..."
-            required
-    />
-    <div class="form-control">
-        <label for="bot">Cerveau : </label>
-        <select name="bot_brain" id="bot_brain">
-            <%brainlist.forEach((e) => {%>
-            <option value="<%=e%>"><%=e%></option>
-            <%})%>
-        </select>
-    </div>
-    <button type="submit" class="btn">Valider</button>
-</form>
-
-</body>
+        <div class="join-container">
+            <header class="join-header">
+                <h1>BotLane</h1>
+                <h3>Ajouter un bot</h3>
+            </header>
+            <main class="join-main">
+                <form action = '/addbot2' method = "post">
+                    <input
+                        type="text"
+                        name="bot_name"
+                        id="bot_name"
+                        placeholder="Nom du bot..."
+                        required
+                    />
+                    <div class="form-control">
+                        <label for="bot" style="margin-top: 5px;">Cerveau : </label>
+                        <select name="bot_brain" id="bot_brain">
+                            <%brainlist.forEach((e) => {%>
+                            <option value="<%=e%>"><%=e%></option>
+                            <%})%>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Valider</button>
+                    <input type="button" class="btn" value="Retour" onclick="window.location = '/';">
+                </form>
+            </main>
+        </div>
+    </body>
 </html>

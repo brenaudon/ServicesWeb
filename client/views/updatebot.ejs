@@ -1,24 +1,32 @@
 <%- include("top.ejs") %>
 
-<form action = '/updatebot2' method = "post">
-    <div class="form-control">
-        <label for="bot">Bot</label>
-        <select name="bot_name" id="bot_name">
-            <%botlist.forEach((e) => {%>
-            <option value="<%=e.name%>"><%=e.name%></option>
-            <%})%>
-        </select>
-    </div>
-    <div class="form-control">
-        <label for="bot">Cerveau : </label>
-        <select name="bot_brain" id="bot_brain">
-            <%brainlist.forEach((e) => {%>
-            <option value="<%=e%>"><%=e%></option>
-            <%})%>
-        </select>
-    </div>
-    <button type="submit" class="btn">Valider</button>
-</form>
-
-</body>
+        <div class="join-container">
+            <header class="join-header">
+                <h1>BotLane</h1>
+                <h3>Modifier un bot</h3>
+            </header>
+            <main class="join-main">
+                <form action = '/updatebot2' method = "post">
+                    <div class="form-control">
+                        <label for="bot">Bot :</label>
+                        <select name="bot_name" id="bot_name">
+                            <%botlist.forEach((e) => {%>
+                            <option value="<%=e.name%>"><%=e.name%></option>
+                            <%})%>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label for="bot">Cerveau : </label>
+                        <select name="bot_brain" id="bot_brain">
+                            <%brainlist.forEach((e) => {%>
+                            <option value="<%=e%>"><%=e%></option>
+                            <%})%>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Valider</button>
+                    <input type="button" class="btn" value="Retour" onclick="window.location = '/';">
+                </form>
+            </main>
+        </div>
+    </body>
 </html>
