@@ -22,10 +22,10 @@ app.use(express.static(__dirname+'/public'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-var Bot = new RiveScript();
+let Bot = new RiveScript();
 
-var Bots = [];
-initBots();
+let Bots;
+
 
 io.on('connection', socket => {
 
@@ -116,7 +116,20 @@ app.post('/addbot2',(req,res) => {
             let xml_req2 = new XMLHttpRequest();
             xml_req2.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
-                    res.locals.botlist = JSON.parse(xml_req2.responseText);
+                    let botlist =JSON.parse(xml_req2.responseText);
+                    res.locals.botlist = botlist;
+                    let Bots2 = [];
+                    for (let i = 0; i < botlist.length; i++){
+                        Bots2.push([botlist[i].name,null]);
+                    }
+                    for (let j = 0; j < Bots.length; j++){
+                        for (let k = 0; k < Bots2.length; k++){
+                            if (Bots[j][0] === Bots2[k][0] && Bots[j][1] != null){
+                                Bots2[k][1]=Bots[j][1];
+                            }
+                        }
+                    }
+                    Bots = Bots2;
                     res.render("index");
                 }
             };
@@ -137,7 +150,20 @@ app.post('/delbot2',(req,res) => {
             let xml_req2 = new XMLHttpRequest();
             xml_req2.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
-                    res.locals.botlist = JSON.parse(xml_req2.responseText);
+                    let botlist = JSON.parse(xml_req2.responseText);
+                    res.locals.botlist = botlist;
+                    let Bots2 = [];
+                    for (let i = 0; i < botlist.length; i++){
+                        Bots2.push([botlist[i].name,null]);
+                    }
+                    for (let j = 0; j < Bots.length; j++){
+                        for (let k = 0; k < Bots2.length; k++){
+                            if (Bots[j][0] === Bots2[k][0] && Bots[j][1] != null){
+                                Bots2[k][1]=Bots[j][1];
+                            }
+                        }
+                    }
+                    Bots = Bots2;
                     res.render("index");
                 }
             };
@@ -158,7 +184,20 @@ app.post('/updatebot2',(req,res) => {
             let xml_req2 = new XMLHttpRequest();
             xml_req2.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
-                    res.locals.botlist = JSON.parse(xml_req2.responseText);
+                    let botlist = JSON.parse(xml_req2.responseText);
+                    res.locals.botlist = botlist;
+                    let Bots2 = [];
+                    for (let i = 0; i < botlist.length; i++){
+                        Bots2.push([botlist[i].name,null]);
+                    }
+                    for (let j = 0; j < Bots.length; j++){
+                        for (let k = 0; k < Bots2.length; k++){
+                            if (Bots[j][0] === Bots2[k][0] && Bots[j][1] != null){
+                                Bots2[k][1]=Bots[j][1];
+                            }
+                        }
+                    }
+                    Bots = Bots2;
                     res.render("index");
                 }
             };
@@ -189,7 +228,20 @@ function getBotList(req,res,next){
     let xml_req = new XMLHttpRequest();
     xml_req.onreadystatechange = function() {
         if (this.readyState === 4 && this.status === 200) {
-            res.locals.botlist = JSON.parse(xml_req.responseText);
+            let botlist = JSON.parse(xml_req.responseText);
+            res.locals.botlist = botlist;
+            let Bots2 = [];
+            for (let i = 0; i < botlist.length; i++){
+                Bots2.push([botlist[i].name,null]);
+            }
+            for (let j = 0; j < Bots.length; j++){
+                for (let k = 0; k < Bots2.length; k++){
+                    if (Bots[j][0] === Bots2[k][0] && Bots[j][1] != null){
+                        Bots2[k][1]=Bots[j][1];
+                    }
+                }
+            }
+            Bots = Bots2;
             next();
         }
     };
@@ -211,6 +263,8 @@ function getBrainList(req,res,next){
 
 
 server.listen(port,host,() => {
+    Bots = [];
+    initBots();
     console.log(`app listening @ http://${host}:${port}`)
 })
 

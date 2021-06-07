@@ -1,5 +1,4 @@
 const express = require("express");
-const RiveScript = require("rivescript");
 const fs = require('fs');
 
 const DBManager = require('./utils/LowDB');
